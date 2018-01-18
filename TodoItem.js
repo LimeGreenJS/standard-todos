@@ -4,14 +4,17 @@ import { graphql } from 'react-apollo';
 
 import { QUERY_ALL_TASKS } from './TodoList';
 
-const TodoItem = ({ item, mutate }) => {
+const TodoItem = ({ userInfo, item, mutate }) => {
   const onClick = (event) => {
     mutate({ variables: { id: item.id } });
   };
+  const { id } = userInfo || {};
   return (
     <div>
       {item.title} - {item.description}
-      <button onClick={onClick}>Delete</button>
+      {(!item.owner || item.owner.id === id) &&
+        <button onClick={onClick}>Delete</button>}
+      {item.owner && <span>(Owned by: {item.owner.email})</span>}
     </div>
   );
 };

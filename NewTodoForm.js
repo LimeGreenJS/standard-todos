@@ -4,13 +4,14 @@ import { graphql } from 'react-apollo';
 
 import { QUERY_ALL_TASKS } from './TodoList';
 
-const NewTodoForm = ({ mutate }) => {
+const NewTodoForm = ({ userInfo, mutate }) => {
   const onClick = (event) => {
     event.preventDefault();
     const title = event.target.parentNode.title.value;
     if (!title) return;
     const description = event.target.parentNode.description.value;
-    mutate({ variables: { title, description } });
+    const ownerId = userInfo && userInfo.id
+    mutate({ variables: { title, description, ownerId } });
   };
   return (
     <form>
@@ -23,11 +24,14 @@ const NewTodoForm = ({ mutate }) => {
 };
 
 const CREATE_TASK = gql`
-mutation createTask($title: String!, $description: String) {
-  createTask(title: $title, description: $description) {
+mutation createTask($title: String!, $description: String, $ownerId: ID) {
+  createTask(title: $title, description: $description, ownerId: $ownerId) {
     id
     title
     description
+    owner {
+      id
+    }
   }
 }
 `;
