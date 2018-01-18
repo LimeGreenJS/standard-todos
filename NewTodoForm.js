@@ -15,9 +15,9 @@ const NewTodoForm = ({ userInfo, mutate }) => {
   };
   return (
     <form>
-      <input name="title" />
+      <input name="title" placeholder="Enter title..." />
       -
-      <input name="description" />
+      <input name="description" placeholder="Enter description..." />
       <button type="submit" onClick={onClick}>Add</button>
     </form>
   );
