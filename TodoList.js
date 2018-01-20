@@ -18,8 +18,8 @@ const TodoList = ({ userInfo, data: { loading, error, allTasks } }) => (
 );
 
 export const QUERY_ALL_TASKS = gql`
-{
-  allTasks(orderBy: createdAt_DESC) {
+query queryTasks($filter: TaskFilter){
+  allTasks(filter: $filter, orderBy: createdAt_DESC) {
     id
     title
     description
@@ -31,4 +31,23 @@ export const QUERY_ALL_TASKS = gql`
 }
 `;
 
-export default graphql(QUERY_ALL_TASKS)(TodoList);
+const config = {
+  options: ({ userInfo }) => ({
+    variables: {
+      filter: {
+        OR: [{
+          private: false,
+        }, {
+          private: null,
+        }, {
+          private: true,
+          owner: {
+            id: userInfo && userInfo.id,
+          },
+        }],
+      },
+    },
+  }),
+};
+
+export default graphql(QUERY_ALL_TASKS, config)(TodoList);
