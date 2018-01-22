@@ -2,7 +2,7 @@ import React from 'react';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 
-import { QUERY_ALL_TASKS } from './TodoList';
+import { QUERY_ALL_TASKS, getQueryAllTasksVariables } from './TodoList';
 
 const TodoItem = ({ userInfo, item, mutate }) => {
   const onClick = (event) => {
@@ -11,10 +11,10 @@ const TodoItem = ({ userInfo, item, mutate }) => {
   const { id } = userInfo || {};
   return (
     <div>
-      {item.title} - {item.description}
       {(!item.owner || item.owner.id === id) &&
-        <button onClick={onClick}>Delete</button>}
-      {item.owner && <span>(Owned by: {item.owner.email})</span>}
+        <button className="delete" onClick={onClick}>&times;</button>}
+      {item.owner && <strong>{item.owner.email}&nbsp;</strong>}
+      {item.title} - {item.description}
     </div>
   );
 };
@@ -28,15 +28,18 @@ mutation deleteTask($id: ID!) {
 `;
 
 const config = {
-  options: {
-    update: (proxy, { data: { deleteTask } }) => {
-      const data = proxy.readQuery({ query: QUERY_ALL_TASKS });
-      const index = data.allTasks.findIndex(task => task.id === deleteTask.id);
-      if (index >= 0) {
-        data.allTasks.splice(index, 1);
-        proxy.writeQuery({ query: QUERY_ALL_TASKS, data });
-      }
-    },
+  options: ({ userInfo }) => {
+    const variables = getQueryAllTasksVariables(userInfo);
+    return {
+      update: (proxy, { data: { deleteTask } }) => {
+        const data = proxy.readQuery({ query: QUERY_ALL_TASKS, variables });
+        const index = data.allTasks.findIndex(task => task.id === deleteTask.id);
+        if (index >= 0) {
+          data.allTasks.splice(index, 1);
+          proxy.writeQuery({ query: QUERY_ALL_TASKS, variables, data });
+        }
+      },
+    };
   },
 };
 

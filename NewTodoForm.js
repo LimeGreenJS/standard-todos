@@ -2,7 +2,7 @@ import React from 'react';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 
-import { QUERY_ALL_TASKS } from './TodoList';
+import { QUERY_ALL_TASKS, getQueryAllTasksVariables } from './TodoList';
 
 const NewTodoForm = ({ userInfo, mutate }) => {
   const onClick = (event) => {
@@ -15,17 +15,20 @@ const NewTodoForm = ({ userInfo, mutate }) => {
     mutate({ variables: { title, description, ownerId, isPrivate } });
   };
   return (
-    <form>
+    <form className="new-task">
       <input name="title" placeholder="Enter title..." />
-      -
       <input name="description" placeholder="Enter description..." />
-      <button type="submit" onClick={onClick}>Add</button>
       {userInfo && (
-        <span>
+        <div>
+          <input
+            name="isPrivate"
+            type="checkbox"
+            style={{ width: 'inherit', marginBottom: 20 }}
+          />
           private
-          <input name="isPrivate" type="checkbox" />
-        </span>
+        </div>
       )}
+      <button type="submit" onClick={onClick}>Add</button>
     </form>
   );
 };
@@ -37,19 +40,24 @@ mutation createTask($title: String!, $description: String, $ownerId: ID, $isPriv
     title
     description
     owner {
+      email
       id
     }
+    private
   }
 }
 `;
 
 const config = {
-  options: {
-    update: (proxy, { data: { createTask } }) => {
-      const data = proxy.readQuery({ query: QUERY_ALL_TASKS });
-      data.allTasks.unshift(createTask);
-      proxy.writeQuery({ query: QUERY_ALL_TASKS, data });
-    },
+  options: ({ userInfo }) => {
+    const variables = getQueryAllTasksVariables(userInfo);
+    return {
+      update: (proxy, { data: { createTask } }) => {
+        const data = proxy.readQuery({ query: QUERY_ALL_TASKS, variables });
+        data.allTasks.unshift(createTask);
+        proxy.writeQuery({ query: QUERY_ALL_TASKS, variables, data });
+      },
+    };
   },
 };
 
