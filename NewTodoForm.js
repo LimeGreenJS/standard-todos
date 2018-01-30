@@ -9,9 +9,9 @@ const NewTodoForm = ({ userInfo, mutate }) => {
     event.preventDefault();
     const title = event.target.parentNode.title.value;
     if (!title) return;
+    const ownerId = userInfo && userInfo.id;
     const description = event.target.parentNode.description.value;
-    const isPrivate = event.target.parentNode.isPrivate.checked;
-    const ownerId = userInfo && userInfo.id
+    const isPrivate = ownerId && event.target.parentNode.isPrivate.checked;
     mutate({ variables: { title, description, ownerId, isPrivate } });
   };
   return (
