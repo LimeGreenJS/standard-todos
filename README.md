@@ -34,3 +34,56 @@ type User @model {
 }
 ```
 
+## Graphcool permission queries for Task
+### Read permission for Everyone
+```
+query ($node_id: ID!) {
+  SomeTaskExists(
+    filter: {
+      id: $node_id
+      OR: [{
+        private: false
+      }, {
+        private: null
+      }]
+    }
+  )
+}
+```
+### Update/Delete permisson for Everyone
+```
+query ($node_id: ID!) {
+  SomeTaskExists(
+    filter: {
+      id: $node_id
+      owner: null
+    }
+  )
+}
+```
+### Read permission for Authenticated
+```
+query ($node_id: ID!, $user_id: ID!) {
+  SomeTaskExists(
+    filter: {
+      id: $node_id
+      owner: {
+        id: $user_id
+      }
+    }
+  )
+}
+```
+### Update/Delete permission for Authenticated
+```
+query ($node_id: ID!, $user_id: ID!) {
+  SomeTaskExists(
+    filter: {
+      id: $node_id
+      owner: {
+        id: $user_id
+      }
+    }
+  )
+}
+```
