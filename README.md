@@ -2,7 +2,7 @@
 LimeGreenJS-enabled standard todos example
 
 ## Graphcool schema
-First, you need to enable Email-Password Auth integration.
+At first, you need to enable Email-Password Auth integration.
 ```
 type Task @model {
   id: ID! @isUnique
