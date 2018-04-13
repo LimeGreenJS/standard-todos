@@ -23,9 +23,9 @@ const NewTodoForm = ({ userInfo }) => (
   <Mutation
     mutation={CREATE_TASK}
     update={(cache, { data: { createTask } }) => {
+      const variables = getQueryAllTasksVariables(userInfo);
       const data = cache.readQuery({ query: QUERY_ALL_TASKS, variables });
       data.allTasks.unshift(createTask);
-      const variables = getQueryAllTasksVariables(userInfo);
       cache.writeQuery({ query: QUERY_ALL_TASKS, variables, data });
     }}
   >
