@@ -24,7 +24,7 @@ const TodoItem = ({ userInfo, item }) => (
         cache.writeQuery({ query: QUERY_ALL_TASKS, variables, data });
       }
     }}
-  />
+  >
     {(deleteTask) => {
       const onClick = (event) => {
         deleteTask({ variables: { id: item.id } });
