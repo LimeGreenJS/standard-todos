@@ -1,24 +1,8 @@
 import React from 'react';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { Query } from 'react-apollo';
 
 import TodoItem from './TodoItem';
-
-const TodoList = ({ userInfo, data: { loading, error, allTasks } }) => (
-  loading ? <p>Loading...</p> :
-  error ? <p>Error: {error.message}</p> : (
-    <ul>
-      {allTasks.map(task => (
-        <li
-          key={task.id}
-          className={task.private && 'private' || ''}
-        >
-          <TodoItem userInfo={userInfo} item={task} />
-        </li>
-      ))}
-    </ul>
-  )
-);
 
 export const QUERY_ALL_TASKS = gql`
 query queryTasks($filter: TaskFilter){
@@ -50,10 +34,27 @@ export const getQueryAllTasksVariables = userInfo => ({
   },
 });
 
-const config = {
-  options: ({ userInfo }) => ({
-    variables: getQueryAllTasksVariables(userInfo),
-  }),
-};
+const TodoList = ({ userInfo }) => (
+  <Query
+    query={QUERY_ALL_TASKS}
+    variables={getQueryAllTasksVariables(userInfo)}
+  >
+    {({ loading, error, data }) => (
+      loading ? <p>Loading...</p> :
+      error ? <p>Error: {error.message}</p> : (
+        <ul>
+          {data.allTasks.map(task => (
+            <li
+              key={task.id}
+              className={task.private && 'private' || ''}
+            >
+              <TodoItem userInfo={userInfo} item={task} />
+            </li>
+          ))}
+        </ul>
+      )
+    )}
+  </Query>
+);
 
-export default graphql(QUERY_ALL_TASKS, config)(TodoList);
+export default TodoList;
