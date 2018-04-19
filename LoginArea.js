@@ -1,12 +1,14 @@
 import React from 'react';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
+import { Query } from 'react-apollo';
 
 import { GRAPHCOOL_TOKEN } from './App';
 import SignupForm from './SignupForm';
 import LoginForm from './LoginForm';
 
-class LoginArea extends React.PureComponent {
+// TODO I don't think this component is well structured.
+
+class LoginComponent extends React.PureComponent {
   constructor() {
     super();
     this.doLogout = this.doLogout.bind(this);
@@ -34,7 +36,7 @@ class LoginArea extends React.PureComponent {
       setUserInfo,
       signupMode,
       toggleSignupMode,
-      data: { loading },
+      loading,
     } = this.props;
     if (loading) return <p>Cheking login...</p>;
     if (userInfo) {
@@ -65,4 +67,12 @@ const USER = gql`
 }
 `;
 
-export default graphql(USER)(LoginArea);
+const LoginArea = (props) => (
+  <Query query={USER}>
+    {(additionalProps) => (
+      <LoginComponent {...props} {...additionalProps} />
+    )}
+  </Query>
+);
+
+export default LoginArea;
